@@ -88,11 +88,13 @@ public class SequencerActivity extends Activity {
 			mp.get(1).setDataSource(afd2.getFileDescriptor(), afd2.getStartOffset(),
 					afd2.getLength());
 			mp.get(1).prepare();
-			mp.get(2).setDataSource(afd2.getFileDescriptor(), afd2.getStartOffset(),
-					afd2.getLength());
+			AssetFileDescriptor afd3 = getAssets().openFd("wooble.mp3");
+			mp.get(2).setDataSource(afd3.getFileDescriptor(), afd3.getStartOffset(),
+					afd3.getLength());
 			mp.get(2).prepare();
-			mp.get(3).setDataSource(afd2.getFileDescriptor(), afd2.getStartOffset(),
-					afd2.getLength());
+			AssetFileDescriptor afd4 = getAssets().openFd("wooble2.mp3");
+			mp.get(3).setDataSource(afd4.getFileDescriptor(), afd4.getStartOffset(),
+					afd4.getLength());
 			mp.get(3).prepare();
 		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
@@ -134,7 +136,7 @@ public class SequencerActivity extends Activity {
 		this.stopMusic();
 		tempo = getTempo();
 
-		if (tempo > 40 && tempo < 200) {
+		if (tempo > 40 && tempo < 300) {
 			Log.i("tempo", "Big Step : " + tempo + "/"
 					+ (60000.0 / (tempo * 1000.0)) * 4.0);
 			TimerTask tt = new MusicTask(mp, cb, tempo);
