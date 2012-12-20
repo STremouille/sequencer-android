@@ -51,7 +51,7 @@ public class SequencerActivity extends Activity {
 		temp2.add((CheckBox) findViewById(R.id.CheckBox12));
 		temp2.add((CheckBox) findViewById(R.id.CheckBox13));
 		temp2.add((CheckBox) findViewById(R.id.CheckBox14));
-		cb.put(0, temp2);
+		cb.put(1, temp2);
 		
 		//3 line
 		ArrayList<CheckBox> temp3 = new ArrayList<CheckBox>();
@@ -59,7 +59,7 @@ public class SequencerActivity extends Activity {
 		temp3.add((CheckBox) findViewById(R.id.CheckBox22));
 		temp3.add((CheckBox) findViewById(R.id.CheckBox23));
 		temp3.add((CheckBox) findViewById(R.id.CheckBox24));
-		cb.put(0, temp3);
+		cb.put(2, temp3);
 		
 		//4 line
 		ArrayList<CheckBox> temp4 = new ArrayList<CheckBox>();
@@ -67,7 +67,7 @@ public class SequencerActivity extends Activity {
 		temp4.add((CheckBox) findViewById(R.id.CheckBox32));
 		temp4.add((CheckBox) findViewById(R.id.CheckBox33));
 		temp4.add((CheckBox) findViewById(R.id.CheckBox34));
-		cb.put(0, temp4);
+		cb.put(3, temp4);
 
 		t = new Timer();
 		for (int i = 0; i < cb.size(); i++) {
@@ -76,17 +76,24 @@ public class SequencerActivity extends Activity {
 				cb.get(i).get(j).setChecked(false);
 			}
 		}
+		mp = new ArrayList<MediaPlayer>();
 		mp.add(new MediaPlayer());mp.add(new MediaPlayer());mp.add(new MediaPlayer());
 		mp.add(new MediaPlayer());
 		try {
 			AssetFileDescriptor afd1 = getAssets().openFd("kick.wav");
-			mp.get(1).setDataSource(afd1.getFileDescriptor(), afd1.getStartOffset(),
+			mp.get(0).setDataSource(afd1.getFileDescriptor(), afd1.getStartOffset(),
 					afd1.getLength());
-			mp.get(1).prepare();
+			mp.get(0).prepare();
 			AssetFileDescriptor afd2 = getAssets().openFd("tom.wav");
+			mp.get(1).setDataSource(afd2.getFileDescriptor(), afd2.getStartOffset(),
+					afd2.getLength());
+			mp.get(1).prepare();
 			mp.get(2).setDataSource(afd2.getFileDescriptor(), afd2.getStartOffset(),
 					afd2.getLength());
 			mp.get(2).prepare();
+			mp.get(3).setDataSource(afd2.getFileDescriptor(), afd2.getStartOffset(),
+					afd2.getLength());
+			mp.get(3).prepare();
 		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
