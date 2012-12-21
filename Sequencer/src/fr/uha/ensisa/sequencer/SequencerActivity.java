@@ -9,6 +9,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.media.MediaPlayer;
@@ -24,6 +25,7 @@ public class SequencerActivity extends Activity {
 	ArrayList<MediaPlayer> mp;
 	HashMap<Integer, ArrayList<CheckBox>> cb;
 	Button start, stop;
+	Button switch1,switch2,switch3,switch4;
 	Timer t;
 	float tempo;
 
@@ -124,6 +126,23 @@ public class SequencerActivity extends Activity {
 				stopMusic();
 			}
 		});
+		
+		
+	}
+	
+	public void switchClick(View view) {
+	    // Do something in response to button
+		Intent intent = new Intent(this,FileChooserActivity.class);
+		startActivity(intent);
+	}
+	
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		Intent intent = getIntent();
+		String rse = intent.getStringExtra("newSound");
+		Log.i("myassets", "new sound -> "+rse);
 	}
 
 	private void stopMusic() {
