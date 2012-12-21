@@ -41,12 +41,23 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:text="4" />
+
+        <Button
+            android:id="@+id/switch1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/mySwitch" 
+    		android:onClick="switchClick" />
+
     </LinearLayout>
-
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.14" >
+        android:layout_weight="0.14"
+        android:gravity="center" >
 
         <CheckBox
             android:id="@+id/CheckBox11"
@@ -79,52 +90,76 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:text="4" />
+
+        <Button
+            android:id="@+id/switch2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/mySwitch"  
+    		android:onClick="switchClick"/>
 
     </LinearLayout>
-
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.14" >
-
+        android:layout_weight="0.14"
+        android:gravity="center" >
+
         <CheckBox
             android:id="@+id/CheckBox21"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
+            android:gravity="center"
             android:text="1" />
-
+
         <CheckBox
             android:id="@+id/CheckBox22"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
+            android:gravity="center"
             android:text="2" />
-
+
         <CheckBox
             android:id="@+id/CheckBox23"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
+            android:gravity="center"
             android:text="3" />
-
+
         <CheckBox
             android:id="@+id/CheckBox24"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
+            android:gravity="center"
             android:text="4" />
+
+        <Button
+            android:id="@+id/switch3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/mySwitch"  
+    		android:onClick="switchClick"/>
 
     </LinearLayout>
-
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.14" >
+        android:layout_weight="0.14"
+        android:gravity="center" >
 
         <CheckBox
             android:id="@+id/CheckBox31"
@@ -157,6 +192,15 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:text="4" />
+
+        <Button
+            android:id="@+id/switch4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/mySwitch"  
+    		android:onClick="switchClick"/>
 
     </LinearLayout>
 
