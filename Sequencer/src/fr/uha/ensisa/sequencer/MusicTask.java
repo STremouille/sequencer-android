@@ -13,8 +13,7 @@ public class MusicTask extends TimerTask {
 	HashMap<Integer, ArrayList<CheckBox>> cb;
 	int waitBetweenStep;
 
-	public MusicTask(ArrayList<MediaPlayer> mp,
-			HashMap<Integer, ArrayList<CheckBox>> cb, float tempo) {
+	public MusicTask(ArrayList<MediaPlayer> mp,	HashMap<Integer, ArrayList<CheckBox>> cb, float tempo) {
 		this.mp = mp;
 		this.cb = cb;
 		this.waitBetweenStep = (int) ((60.0 / tempo) * 1000.0);

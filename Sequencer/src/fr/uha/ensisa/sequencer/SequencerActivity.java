@@ -2,6 +2,7 @@ package fr.uha.ensisa.sequencer;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
+import java.text.AttributedCharacterIterator.Attribute;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -9,108 +10,102 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Activity;
+import android.app.ActionBar.LayoutParams;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.InputType;
+import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 public class SequencerActivity extends Activity {
-	/** Called when the activity is first created. */
+	private static final int DEFAULT_TEMPO = 140;
 	ArrayList<MediaPlayer> mp;
-	HashMap<Integer, ArrayList<CheckBox>> cb;
+	HashMap<Integer, ArrayList<CheckBox>> checkbox;
+	HashMap<Integer, String> instrumentNameById;
 	Button start, stop;
-	Button switch1,switch2,switch3,switch4;
+	int instrumentCount;
 	Timer t;
 	float tempo;
+	Context context;
+	EditText editTempo;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-
-		start = (Button) findViewById(R.id.start);
-		stop = (Button) findViewById(R.id.stop);
-		tempo = 60;
-
-		cb = new HashMap<Integer, ArrayList<CheckBox>>();
-		//1er line
-		ArrayList<CheckBox> temp1 = new ArrayList<CheckBox>();
-		temp1.add((CheckBox) findViewById(R.id.CheckBox01));
-		temp1.add((CheckBox) findViewById(R.id.CheckBox02));
-		temp1.add((CheckBox) findViewById(R.id.CheckBox03));
-		temp1.add((CheckBox) findViewById(R.id.CheckBox04));
-		cb.put(0, temp1);
+		initListInstrument();
+		instrumentCount = 4;
+		checkbox = new HashMap<Integer, ArrayList<CheckBox>>();
+		context=this;
 		
-		//2 line
-		ArrayList<CheckBox> temp2 = new ArrayList<CheckBox>();
-		temp2.add((CheckBox) findViewById(R.id.CheckBox11));
-		temp2.add((CheckBox) findViewById(R.id.CheckBox12));
-		temp2.add((CheckBox) findViewById(R.id.CheckBox13));
-		temp2.add((CheckBox) findViewById(R.id.CheckBox14));
-		cb.put(1, temp2);
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
 		
-		//3 line
-		ArrayList<CheckBox> temp3 = new ArrayList<CheckBox>();
-		temp3.add((CheckBox) findViewById(R.id.CheckBox21));
-		temp3.add((CheckBox) findViewById(R.id.CheckBox22));
-		temp3.add((CheckBox) findViewById(R.id.CheckBox23));
-		temp3.add((CheckBox) findViewById(R.id.CheckBox24));
-		cb.put(2, temp3);
-		
-		//4 line
-		ArrayList<CheckBox> temp4 = new ArrayList<CheckBox>();
-		temp4.add((CheckBox) findViewById(R.id.CheckBox31));
-		temp4.add((CheckBox) findViewById(R.id.CheckBox32));
-		temp4.add((CheckBox) findViewById(R.id.CheckBox33));
-		temp4.add((CheckBox) findViewById(R.id.CheckBox34));
-		cb.put(3, temp4);
-
-		t = new Timer();
-		for (int i = 0; i < cb.size(); i++) {
-			for(int j=0;j<4;j++)
-			{
-				cb.get(i).get(j).setChecked(false);
-			}
-		}
 		mp = new ArrayList<MediaPlayer>();
-		mp.add(new MediaPlayer());mp.add(new MediaPlayer());mp.add(new MediaPlayer());
-		mp.add(new MediaPlayer());
-		try {
-			AssetFileDescriptor afd1 = getAssets().openFd("kick.wav");
-			mp.get(0).setDataSource(afd1.getFileDescriptor(), afd1.getStartOffset(),
-					afd1.getLength());
-			mp.get(0).prepare();
-			AssetFileDescriptor afd2 = getAssets().openFd("tom.wav");
-			mp.get(1).setDataSource(afd2.getFileDescriptor(), afd2.getStartOffset(),
-					afd2.getLength());
-			mp.get(1).prepare();
-			AssetFileDescriptor afd3 = getAssets().openFd("wooble.mp3");
-			mp.get(2).setDataSource(afd3.getFileDescriptor(), afd3.getStartOffset(),
-					afd3.getLength());
-			mp.get(2).prepare();
-			AssetFileDescriptor afd4 = getAssets().openFd("wooble2.mp3");
-			mp.get(3).setDataSource(afd4.getFileDescriptor(), afd4.getStartOffset(),
-					afd4.getLength());
-			mp.get(3).prepare();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalStateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		
+		
+		for(int line=0;line<instrumentCount;line++){
+			ArrayList<CheckBox> temp = new ArrayList<CheckBox>();
+			LinearLayout instrumentLine = new LinearLayout(this);
+			
+			//init of sound
+			mp.add(new MediaPlayer());
+			AssetFileDescriptor afd;
+			try {
+				afd = getAssets().openFd(instrumentNameById.get(line));
+				mp.get(line).setDataSource(afd.getFileDescriptor(), afd.getStartOffset(),
+						afd.getLength());
+				mp.get(line).prepare();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			//init of checkbox + switchbutton
+			for(int i=0;i<4;i++)
+			{
+				CheckBox cb = new CheckBox(this);
+				cb.setGravity(Gravity.CENTER);
+				instrumentLine.addView(cb);
+				temp.add(cb);
+			}
+			checkbox.put(line, temp);
+			Button switchInstrument = new Button(this); switchInstrument.setText(R.string.mySwitch); switchInstrument.setGravity(Gravity.CENTER);
+			switchInstrument.setOnClickListener(new View.OnClickListener() {
+				
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					Intent intent = new Intent(context,FileChooserActivity.class);
+					intent.putExtra("InstrumentLine", "file");
+					startActivity(intent);
+				}
+			});
+			instrumentLine.addView(switchInstrument);
+			layout.addView(instrumentLine,LayoutParams.MATCH_PARENT);
 		}
-
-		//
-
+		
+		//Tempo
+		editTempo = new EditText(this);
+		editTempo.setHint(R.string.tempoHint);
+		editTempo.setInputType(InputType.TYPE_CLASS_NUMBER);
+		layout.addView(editTempo);
+		
+		//Button Start/Stop
+		LinearLayout ButtonLayout = new LinearLayout(this);
+		ButtonLayout.setOrientation(LinearLayout.HORIZONTAL);
+		start = new Button(this);
+		start.setText(R.string.start);
 		start.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
@@ -118,7 +113,9 @@ public class SequencerActivity extends Activity {
 				startMusic();
 			}
 		});
-
+		ButtonLayout.addView(start);
+		stop = new Button(this);
+		stop.setText(R.string.stop);
 		stop.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
@@ -126,14 +123,30 @@ public class SequencerActivity extends Activity {
 				stopMusic();
 			}
 		});
+		ButtonLayout.addView(stop);
+		
+		layout.addView(ButtonLayout);
 		
 		
+		
+		this.setContentView(layout);
+		
+
+		t = new Timer();
+	
 	}
+	
+	public void initListInstrument(){
+		instrumentNameById = new HashMap<Integer, String>();
+		instrumentNameById.put(0, "kick.wav");
+		instrumentNameById.put(1, "tom.wav");
+		instrumentNameById.put(2, "wooble.mp3");
+		instrumentNameById.put(3, "wooble2.mp3");
+	}
+		
 	
 	public void switchClick(View view) {
 	    // Do something in response to button
-		Intent intent = new Intent(this,FileChooserActivity.class);
-		startActivity(intent);
 	}
 	
 	@Override
@@ -158,17 +171,16 @@ public class SequencerActivity extends Activity {
 		if (tempo > 40 && tempo < 300) {
 			Log.i("tempo", "Big Step : " + tempo + "/"
 					+ (60000.0 / (tempo * 1000.0)) * 4.0);
-			TimerTask tt = new MusicTask(mp, cb, tempo);
+			TimerTask tt = new MusicTask(mp, checkbox, tempo);
 			t.scheduleAtFixedRate(tt, 0, (long) ((60.0/ tempo) * 4000));
 		}
 	}
 
 	private int getTempo() {
-		EditText temp = (EditText) findViewById(R.id.tempo);
-		if (temp.getText().toString().equals(""))
-			return 60;
+		if (editTempo.getText().toString().equals(""))
+			return DEFAULT_TEMPO;
 		else
-			return Integer.valueOf(temp.getText().toString());
+			return Integer.valueOf(editTempo.getText().toString());
 	}
 
 	@Override
