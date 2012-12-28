@@ -24,6 +24,7 @@ public class FileChooserActivity extends Activity{
 	String[] ressources;
 	String selectedFile = "";
 	Context context;
+	int line;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +38,10 @@ public class FileChooserActivity extends Activity{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		Intent i = getIntent();
+		line = i.getIntExtra("InstrumentLine",-1);
+		Log.i("myassets", "line to change : "+line);
 		Log.i("myassets", "Start");
 		context = this;
 		//Build layout
@@ -57,6 +62,7 @@ public class FileChooserActivity extends Activity{
 						selectedFile = (String) temp.getText();
 						Intent intent = new Intent(context, SequencerActivity.class);
 						intent.putExtra("newSound", selectedFile);
+						intent.putExtra("InstrumentLine", line);
 						startActivity(intent);
 					}
 				});
