@@ -127,8 +127,8 @@ public class SequencerActivity extends Activity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				Intent intent = new Intent(context, FileChooserActivity.class);
-				intent.putExtra("InstrumentLine", instrumentCount+1);
-				Log.i("myassets", instrumentCount+1 + "<-instrumentCount");
+				intent.putExtra("InstrumentLine", instrumentCount);
+				Log.i("myassets", instrumentCount + "<-instrumentCount");
 				startActivity(intent);
 			}
 		});
@@ -179,7 +179,7 @@ public class SequencerActivity extends Activity {
 		Log.i("change", rse+" pour le "+line);
 		if (line != -1) {
 			Log.i("change size", instrumentNameById.size()+"");
-			instrumentNameById.put(line-1, rse);
+			instrumentNameById.put(line, rse);
 			Log.i("change size", instrumentNameById.size()+"->"+instrumentNameById.get(5));
 			initView();
 		}
