@@ -1,53 +1,53 @@
 package fr.uha.ensisa.sequencer;
 
-import java.io.FileDescriptor;
 import java.io.IOException;
-import java.text.AttributedCharacterIterator.Attribute;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeMap;
 
 import android.app.Activity;
 import android.app.ActionBar.LayoutParams;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
-import android.content.res.AssetManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.InputType;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 public class SequencerActivity extends Activity {
 	private static final int DEFAULT_TEMPO = 140;
 	ArrayList<MediaPlayer> mp;
 	HashMap<Integer, MediaPlayer> mediaPlayers;
 	HashMap<Integer, ArrayList<CheckBox>> checkbox;
-	static HashMap<Integer, String> instrumentNameById;
+	static TreeMap<Integer, String> instrumentNameById;
 	Button start, stop, addLine;
-	int instrumentCount;
 	Timer t;
 	float tempo;
 	Context context;
 	EditText editTempo;
+	TextView numTV;
+	android.widget.LinearLayout.LayoutParams foot;
+	android.widget.LinearLayout.LayoutParams top;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		initListInstrument();
-		instrumentCount = instrumentNameById.size();
+		int instrumentCount = instrumentNameById.keySet().size();
 		Log.i("create", "creation avec "+instrumentCount+" éléments");
 		context = this;
 		initView();
@@ -59,7 +59,7 @@ public class SequencerActivity extends Activity {
 	public void initListInstrument() {
 		if (instrumentNameById == null) {
 			Log.i("myassets", "InstruList vide");
-			instrumentNameById = new HashMap<Integer, String>();
+			instrumentNameById = new TreeMap<Integer, String>();
 			instrumentNameById.put(0, "kick.wav");
 			instrumentNameById.put(1, "tom.wav");
 			instrumentNameById.put(2, "wooble.mp3");
@@ -68,14 +68,17 @@ public class SequencerActivity extends Activity {
 	}
 
 	public void initView() {
+		foot = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 1.0f);
+		top = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 1.0f);
+		
 		checkbox = new HashMap<Integer, ArrayList<CheckBox>>();
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
-
 		mediaPlayers = new HashMap<Integer, MediaPlayer>();
-		instrumentCount=instrumentNameById.size();
-		Log.i("initView", instrumentCount + "");
-		for (int line = 0; line < instrumentCount; line++) {
+		
+		
+		//line by line
+		for (int line : instrumentNameById.keySet()) {
 			ArrayList<CheckBox> temp = new ArrayList<CheckBox>();
 			LinearLayout instrumentLine = new LinearLayout(this);
 			// init of sound
@@ -87,18 +90,24 @@ public class SequencerActivity extends Activity {
 						afd.getStartOffset(), afd.getLength());
 				mediaPlayers.get(line).prepare();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			//debug indice instrument
+			/*numTV = new TextView(this);
+			numTV.setText(String.valueOf(line));
+			instrumentLine.addView(numTV);*/
 
-			// init of checkbox + switchbutton
+			// init of checkbox
 			for (int i = 0; i < 4; i++) {
 				CheckBox cb = new CheckBox(this);
 				cb.setGravity(Gravity.CENTER);
-				instrumentLine.addView(cb,LayoutParams.WRAP_CONTENT);
+				instrumentLine.addView(cb);
 				temp.add(cb);
 			}
 			checkbox.put(line, temp);
+			
+			//switch
 			Button switchInstrument = new Button(this);
 			switchInstrument.setText(instrumentNameById.get(line));
 			switchInstrument.setGravity(Gravity.CENTER);
@@ -106,7 +115,6 @@ public class SequencerActivity extends Activity {
 			switchInstrument.setOnClickListener(new View.OnClickListener() {
 
 				public void onClick(View v) {
-					// TODO Auto-generated method stub
 					Intent intent = new Intent(context,
 							FileChooserActivity.class);
 					intent.putExtra("InstrumentLine", lineNb);
@@ -115,7 +123,21 @@ public class SequencerActivity extends Activity {
 				}
 			});
 			instrumentLine.addView(switchInstrument);
-			layout.addView(instrumentLine);
+			
+			//delete
+			ImageButton delete = new ImageButton(this);
+			delete.setImageResource(R.drawable.delete);
+			delete.setScaleType(ScaleType.CENTER_CROP);
+			delete.setOnClickListener(new View.OnClickListener() {
+				
+				public void onClick(View v) {
+					reconstruct(lineNb);
+					initView();
+				}
+			});
+			instrumentLine.addView(delete,LayoutParams.MATCH_PARENT);
+			//instrumentLine.setGravity(Gravity.CENTER);
+			layout.addView(instrumentLine,top);
 		}
 
 		// Add line
@@ -125,20 +147,21 @@ public class SequencerActivity extends Activity {
 		addLine.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				Intent intent = new Intent(context, FileChooserActivity.class);
-				intent.putExtra("InstrumentLine", instrumentCount);
-				Log.i("myassets", instrumentCount + "<-instrumentCount");
+				if(instrumentNameById.isEmpty())
+					intent.putExtra("InstrumentLine", 1);
+				else
+					intent.putExtra("InstrumentLine", instrumentNameById.lastKey()+1);
 				startActivity(intent);
 			}
 		});
-		layout.addView(addLine);
+		layout.addView(addLine,foot);
 
 		// Tempo
 		editTempo = new EditText(this);
 		editTempo.setHint(R.string.tempoHint);
 		editTempo.setInputType(InputType.TYPE_CLASS_NUMBER);
-		layout.addView(editTempo);
+		layout.addView(editTempo,foot);
 
 		// Button Start/Stop
 		LinearLayout ButtonLayout = new LinearLayout(this);
@@ -148,7 +171,6 @@ public class SequencerActivity extends Activity {
 		start.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				startMusic();
 			}
 		});
@@ -158,20 +180,18 @@ public class SequencerActivity extends Activity {
 		stop.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				stopMusic();
 			}
 		});
 		ButtonLayout.addView(stop);
 
-		layout.addView(ButtonLayout);
+		layout.addView(ButtonLayout,foot);
 
 		this.setContentView(layout);
 	}
 
 	@Override
 	protected void onResume() {
-		// TODO Auto-generated method stub
 		super.onResume();
 		Intent intent = getIntent();
 		String rse = intent.getStringExtra("newSound");
@@ -202,6 +222,11 @@ public class SequencerActivity extends Activity {
 			TimerTask tt = new MusicTask(mediaPlayers, checkbox, tempo);
 			t.scheduleAtFixedRate(tt, 0, (long) ((60.0 / tempo) * 4000));
 		}
+		
+		if (!(tempo > 40 && tempo < 300)) {
+			DialogFragment df = new TempoDialogFragment();
+			df.show(getFragmentManager(), "tempo");
+		}
 	}
 
 	private int getTempo() {
@@ -213,9 +238,23 @@ public class SequencerActivity extends Activity {
 
 	@Override
 	protected void onPause() {
-		// TODO Auto-generated method stub
 		super.onPause();
 		stopMusic();
+	}
+	
+	private void reconstruct(int i)
+	{
+		instrumentNameById.remove(i);
+	}
+	
+	private int instrumentCount(TreeMap<Integer, String> map)
+	{
+		int res=0;
+		for(int i : map.keySet())
+		{
+			res++;
+		}
+		return res;
 	}
 
 }
