@@ -1,23 +1,16 @@
 package fr.uha.ensisa.sequencer;
 
 import java.io.IOException;
-import java.text.AttributedString;
-import java.util.ArrayList;
 
-import android.app.ActionBar.LayoutParams;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.TextView;
 
 public class FileChooserActivity extends Activity{
 	AssetManager am;
@@ -28,14 +21,12 @@ public class FileChooserActivity extends Activity{
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.filechooser);
 		am = this.getAssets();
 		try {
 			ressources=am.list("");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -58,7 +49,6 @@ public class FileChooserActivity extends Activity{
 				temp.setOnClickListener( new View.OnClickListener() {
 					
 					public void onClick(View v) {
-						// TODO Auto-generated method stub
 						selectedFile = (String) temp.getText();
 						Intent intent = new Intent(context, SequencerActivity.class);
 						intent.putExtra("newSound", selectedFile);

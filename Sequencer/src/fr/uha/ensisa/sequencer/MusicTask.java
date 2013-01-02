@@ -23,7 +23,7 @@ public class MusicTask extends TimerTask {
 	@Override
 	public void run() {
 		for (int i = 0; i < 4; i++) {
-			for (int mpNumber = 0; mpNumber < mediaPlayers.size(); mpNumber++) {
+			for (int mpNumber : mediaPlayers.keySet()) {
 				if (cb.get(mpNumber).get(i).isChecked()) {
 					mediaPlayers.get(mpNumber).seekTo(0);
 					mediaPlayers.get(mpNumber).start();
@@ -33,7 +33,6 @@ public class MusicTask extends TimerTask {
 			try {
 				Thread.currentThread().sleep(waitBetweenStep);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 
 			}

@@ -8,5 +8,8 @@
     <string name="add">Add Instrument</string>
     <string name="tempoHint">Tempo</string>
     <string name="mySwitch">Switch</string>
+    <string name="delete">Delete</string>
+    <string name="badTempo">You picked a wrong tempo, it should be between 40 and 300 bpm</string>
+    <string name="ok">Understood !</string>
 
 </resources>
