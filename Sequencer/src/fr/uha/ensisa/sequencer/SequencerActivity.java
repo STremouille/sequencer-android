@@ -3,6 +3,7 @@ package fr.uha.ensisa.sequencer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
@@ -14,6 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -23,9 +25,11 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 
 public class SequencerActivity extends Activity {
 	private static final int DEFAULT_TEMPO = 140;
@@ -39,8 +43,7 @@ public class SequencerActivity extends Activity {
 	Context context;
 	EditText editTempo;
 	TextView numTV;
-	android.widget.LinearLayout.LayoutParams foot;
-	android.widget.LinearLayout.LayoutParams top;
+	android.widget.LinearLayout.LayoutParams foot,body,eraseButton,instrumentName;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -68,8 +71,13 @@ public class SequencerActivity extends Activity {
 	}
 
 	public void initView() {
+		fetchTransmittedInstrument();
+		
+		
 		foot = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 1.0f);
-		top = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 1.0f);
+		body = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 1.0f);
+		eraseButton = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 1.15f);
+		instrumentName = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 1.0f);
 		
 		checkbox = new HashMap<Integer, ArrayList<CheckBox>>();
 		LinearLayout layout = new LinearLayout(this);
@@ -109,7 +117,9 @@ public class SequencerActivity extends Activity {
 			
 			//switch
 			Button switchInstrument = new Button(this);
-			switchInstrument.setText(instrumentNameById.get(line));
+			int tmpIndex = instrumentNameById.get(line).lastIndexOf(".");
+			String instrName=instrumentNameById.get(line).substring(0, tmpIndex);
+			switchInstrument.setText(instrName);
 			switchInstrument.setGravity(Gravity.CENTER);
 			final int lineNb = line;
 			switchInstrument.setOnClickListener(new View.OnClickListener() {
@@ -122,12 +132,11 @@ public class SequencerActivity extends Activity {
 					startActivity(intent);
 				}
 			});
-			instrumentLine.addView(switchInstrument);
+			instrumentLine.addView(switchInstrument,instrumentName);
 			
 			//delete
-			ImageButton delete = new ImageButton(this);
+			ImageView delete = new ImageView(this);
 			delete.setImageResource(R.drawable.delete);
-			delete.setScaleType(ScaleType.CENTER_CROP);
 			delete.setOnClickListener(new View.OnClickListener() {
 				
 				public void onClick(View v) {
@@ -135,9 +144,9 @@ public class SequencerActivity extends Activity {
 					initView();
 				}
 			});
-			instrumentLine.addView(delete,LayoutParams.MATCH_PARENT);
+			instrumentLine.addView(delete,eraseButton);
 			//instrumentLine.setGravity(Gravity.CENTER);
-			layout.addView(instrumentLine,top);
+			layout.addView(instrumentLine,body);
 		}
 
 		// Add line
@@ -190,19 +199,24 @@ public class SequencerActivity extends Activity {
 		this.setContentView(layout);
 	}
 
+	private void fetchTransmittedInstrument() {
+		//fetch the new instrument if there is something in the extra
+				Intent intent = getIntent();
+				String rse = intent.getStringExtra("newSound");
+				int line1 = intent.getIntExtra("InstrumentLine", -1);
+				Log.i("change", rse+" pour le "+line1);
+				if (line1 != -1) {
+					Log.i("change size", instrumentNameById.size()+"");
+					instrumentNameById.put(line1, rse);
+					Log.i("change size", instrumentNameById.size()+"->"+instrumentNameById.get(5));
+					initView();
+				}
+	}
+
 	@Override
 	protected void onResume() {
 		super.onResume();
-		Intent intent = getIntent();
-		String rse = intent.getStringExtra("newSound");
-		int line = intent.getIntExtra("InstrumentLine", -1);
-		Log.i("change", rse+" pour le "+line);
-		if (line != -1) {
-			Log.i("change size", instrumentNameById.size()+"");
-			instrumentNameById.put(line, rse);
-			Log.i("change size", instrumentNameById.size()+"->"+instrumentNameById.get(5));
-			initView();
-		}
+		
 	}
 
 	private void stopMusic() {
