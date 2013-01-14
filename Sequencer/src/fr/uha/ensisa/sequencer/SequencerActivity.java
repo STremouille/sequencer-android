@@ -201,15 +201,15 @@ public class SequencerActivity extends Activity {
 
 	private void fetchTransmittedInstrument() {
 		//fetch the new instrument if there is something in the extra
-				Intent intent = getIntent();
-				String rse = intent.getStringExtra("newSound");
-				int line1 = intent.getIntExtra("InstrumentLine", -1);
-				Log.i("change", rse+" pour le "+line1);
+
+		
+		Intent intent = getIntent();
+		String rse = intent.getStringExtra("newSound");
+		int line1 = intent.getIntExtra("InstrumentLine", -1);
 				if (line1 != -1) {
-					Log.i("change size", instrumentNameById.size()+"");
+					Log.i("filechooser", line1+"");
 					instrumentNameById.put(line1, rse);
 					Log.i("change size", instrumentNameById.size()+"->"+instrumentNameById.get(5));
-					initView();
 				}
 	}
 
@@ -261,14 +261,4 @@ public class SequencerActivity extends Activity {
 		instrumentNameById.remove(i);
 	}
 	
-	private int instrumentCount(TreeMap<Integer, String> map)
-	{
-		int res=0;
-		for(int i : map.keySet())
-		{
-			res++;
-		}
-		return res;
-	}
-
 }

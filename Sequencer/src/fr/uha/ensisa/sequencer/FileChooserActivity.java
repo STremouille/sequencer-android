@@ -52,6 +52,7 @@ public class FileChooserActivity extends Activity{
 						selectedFile = (String) temp.getText();
 						Intent intent = new Intent(context, SequencerActivity.class);
 						intent.putExtra("newSound", selectedFile);
+						Log.i("filechooser", selectedFile);
 						intent.putExtra("InstrumentLine", line);
 						startActivity(intent);
 					}
