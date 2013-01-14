@@ -43,7 +43,7 @@ public class SequencerActivity extends Activity {
 	Context context;
 	EditText editTempo;
 	TextView numTV;
-	android.widget.LinearLayout.LayoutParams foot,body,eraseButton,instrumentName;
+	android.widget.LinearLayout.LayoutParams foot,body,eraseButton,instrumentName,checkBoxPm;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -76,7 +76,8 @@ public class SequencerActivity extends Activity {
 		
 		foot = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 1.0f);
 		body = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 1.0f);
-		eraseButton = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 1.15f);
+		eraseButton = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 1.1f);
+		checkBoxPm = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT,1.0f);
 		instrumentName = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 1.0f);
 		
 		checkbox = new HashMap<Integer, ArrayList<CheckBox>>();
@@ -89,6 +90,20 @@ public class SequencerActivity extends Activity {
 		for (int line : instrumentNameById.keySet()) {
 			ArrayList<CheckBox> temp = new ArrayList<CheckBox>();
 			LinearLayout instrumentLine = new LinearLayout(this);
+			
+			//name of instrument
+			int tmpIndex = instrumentNameById.get(line).lastIndexOf(".");
+			String instrName=instrumentNameById.get(line).substring(0, tmpIndex);
+			TextView name = new TextView(this);
+			name.setText(instrName);
+			name.setGravity(Gravity.RIGHT);
+			name.setGravity(Gravity.CENTER_VERTICAL);
+			instrumentLine.addView(name,instrumentName);
+			
+			
+			
+			
+			
 			// init of sound
 			mediaPlayers.put(line, new MediaPlayer());
 			AssetFileDescriptor afd;
@@ -110,17 +125,14 @@ public class SequencerActivity extends Activity {
 			for (int i = 0; i < 4; i++) {
 				CheckBox cb = new CheckBox(this);
 				cb.setGravity(Gravity.CENTER);
-				instrumentLine.addView(cb);
+				instrumentLine.addView(cb,checkBoxPm);
 				temp.add(cb);
 			}
 			checkbox.put(line, temp);
 			
 			//switch
-			Button switchInstrument = new Button(this);
-			int tmpIndex = instrumentNameById.get(line).lastIndexOf(".");
-			String instrName=instrumentNameById.get(line).substring(0, tmpIndex);
-			switchInstrument.setText(instrName);
-			switchInstrument.setGravity(Gravity.CENTER);
+			ImageView switchInstrument = new ImageView(this);
+			switchInstrument.setImageResource(R.drawable.change);
 			final int lineNb = line;
 			switchInstrument.setOnClickListener(new View.OnClickListener() {
 
@@ -132,7 +144,7 @@ public class SequencerActivity extends Activity {
 					startActivity(intent);
 				}
 			});
-			instrumentLine.addView(switchInstrument,instrumentName);
+			instrumentLine.addView(switchInstrument,eraseButton);
 			
 			//delete
 			ImageView delete = new ImageView(this);
