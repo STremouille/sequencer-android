@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 
 public class FileChooserActivity extends Activity{
 	AssetManager am;
@@ -36,8 +37,9 @@ public class FileChooserActivity extends Activity{
 		Log.i("myassets", "Start");
 		context = this;
 		//Build layout
-		LinearLayout view = new LinearLayout(this);
-		view.setOrientation(LinearLayout.VERTICAL);
+		ScrollView view = new ScrollView(this);
+		LinearLayout child = new LinearLayout(context);
+		child.setOrientation(LinearLayout.VERTICAL);
 		
 		//ArrayList<Button> res = new ArrayList<Button>();
 		for(String fileInAsset : ressources){
@@ -57,9 +59,11 @@ public class FileChooserActivity extends Activity{
 						startActivity(intent);
 					}
 				});
-				view.addView(temp);
+				child.addView(temp);
 			}
 		}
+		
+		view.addView(child);
 		
 //		for(int i=0;i<res.size();i++){
 //			view.addView(res.get(i), LayoutParams.WRAP_CONTENT);
