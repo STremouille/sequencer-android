@@ -3,11 +3,11 @@ package fr.uha.ensisa.sequencer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActionBar.LayoutParams;
 import android.app.DialogFragment;
@@ -15,7 +15,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -24,9 +23,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -213,8 +210,6 @@ public class SequencerActivity extends Activity {
 
 	private void fetchTransmittedInstrument() {
 		//fetch the new instrument if there is something in the extra
-
-		
 		Intent intent = getIntent();
 		String rse = intent.getStringExtra("newSound");
 		int line1 = intent.getIntExtra("InstrumentLine", -1);
@@ -224,7 +219,8 @@ public class SequencerActivity extends Activity {
 					Log.i("change size", instrumentNameById.size()+"->"+instrumentNameById.get(5));
 				}
 	}
-
+	
+	
 	@Override
 	protected void onResume() {
 		super.onResume();
