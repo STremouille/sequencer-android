@@ -11,5 +11,8 @@
     <string name="delete">Delete</string>
     <string name="badTempo">You picked a wrong tempo, it should be between 40 and 300 bpm</string>
     <string name="ok">Understood !</string>
+    <string name="valid">Validate</string>
+    <string name="cancel">Cancel</string>
+    <string name="pickTheVolume">Pick the volume</string>
 
 </resources>

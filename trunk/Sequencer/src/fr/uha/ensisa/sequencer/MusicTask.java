@@ -10,12 +10,12 @@ import android.widget.CheckBox;
 
 public class MusicTask extends TimerTask {
 	HashMap<Integer, MediaPlayer> mediaPlayers;
-	HashMap<Integer, ArrayList<CheckBox>> cb;
+	CheckBoxParcelable cb;
 	int waitBetweenStep;
 
-	public MusicTask(HashMap<Integer, MediaPlayer> mp,	HashMap<Integer, ArrayList<CheckBox>> cb, float tempo) {
+	public MusicTask(HashMap<Integer, MediaPlayer> mp,	CheckBoxParcelable checkbox, float tempo) {
 		this.mediaPlayers = mp;
-		this.cb = cb;
+		this.cb = checkbox;
 		this.waitBetweenStep = (int) ((60.0 / tempo) * 1000.0);
 		Log.i("tempo", "Step : " + 60.0 / (tempo));
 	}
