@@ -44,7 +44,7 @@ public class FileChooserActivity extends Activity{
 		//ArrayList<Button> res = new ArrayList<Button>();
 		for(String fileInAsset : ressources){
 			Log.i("myassets", fileInAsset);
-			if(!(fileInAsset.equals("images")||fileInAsset.equals("sounds")||fileInAsset.equals("webkit")))
+			if(!(fileInAsset.equals("images")||fileInAsset.equals("sounds")||fileInAsset.equals("webkit")||fileInAsset.equals("kioskmode")))
 			{
 				final Button temp = new Button(this);
 				temp.setText(fileInAsset);

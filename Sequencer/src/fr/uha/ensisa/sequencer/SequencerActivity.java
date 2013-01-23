@@ -14,25 +14,33 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.audiofx.BassBoost.Settings;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class SequencerActivity extends Activity {
 	private static final int DEFAULT_TEMPO = 140;
 	ArrayList<MediaPlayer> mp;
 	HashMap<Integer, MediaPlayer> mediaPlayers;
-	HashMap<Integer, ArrayList<CheckBox>> checkbox;
+	CheckBoxParcelable checkbox;
 	static TreeMap<Integer, String> instrumentNameById;
 	Button start, stop, addLine;
 	Timer t;
@@ -69,7 +77,7 @@ public class SequencerActivity extends Activity {
 
 	public void initView() {
 		fetchTransmittedInstrument();
-		
+		fetchNewVolume();
 		
 		foot = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 1.0f);
 		body = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 1.0f);
@@ -77,7 +85,7 @@ public class SequencerActivity extends Activity {
 		checkBoxPm = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT,1.0f);
 		instrumentName = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 1.0f);
 		
-		checkbox = new HashMap<Integer, ArrayList<CheckBox>>();
+		checkbox = new CheckBoxParcelable();
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
 		mediaPlayers = new HashMap<Integer, MediaPlayer>();
@@ -125,7 +133,7 @@ public class SequencerActivity extends Activity {
 				instrumentLine.addView(cb,checkBoxPm);
 				temp.add(cb);
 			}
-			checkbox.put(line, temp);
+			checkbox.put(line+"", temp);
 			
 			//switch
 			ImageView switchInstrument = new ImageView(this);
@@ -208,6 +216,16 @@ public class SequencerActivity extends Activity {
 		this.setContentView(layout);
 	}
 
+	private void fetchNewVolume() {
+		Intent intent = getIntent();
+		int rse = intent.getIntExtra("volume", -1);
+		if(rse!=-1)
+		{
+			AudioManager audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+			audio.setStreamVolume(AudioManager.STREAM_MUSIC, rse, AudioManager.FLAG_VIBRATE);
+		}
+	}
+
 	private void fetchTransmittedInstrument() {
 		//fetch the new instrument if there is something in the extra
 		Intent intent = getIntent();
@@ -237,7 +255,7 @@ public class SequencerActivity extends Activity {
 		this.stopMusic();
 		tempo = getTempo();
 
-		if (tempo > 40 && tempo < 300) {
+		if (tempo >= 40 && tempo <= 300) {
 			Log.i("tempo", "Big Step : " + tempo + "/"
 					+ (60000.0 / (tempo * 1000.0)) * 4.0);
 			Log.i("MP", mediaPlayers.size() + "");
@@ -264,9 +282,47 @@ public class SequencerActivity extends Activity {
 		stopMusic();
 	}
 	
+	
+
 	private void reconstruct(int i)
 	{
 		instrumentNameById.remove(i);
 	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		
+		LinearLayout layout = new LinearLayout(this);
+		SeekBar bar = new SeekBar(context);
+		bar.setMax(15);
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.layout.menu, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+		switch(item.getItemId()){
+		case R.id.volume:
+			Intent i = new Intent(context,VolumeChooserActivity.class);
+			startActivity(i);			
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		checkbox=savedInstanceState.getParcelable("checkbox");
+		super.onRestoreInstanceState(savedInstanceState);
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		outState.putParcelable("checkbox", checkbox);
+		super.onSaveInstanceState(outState);
+	}
+	
+	
 	
 }
