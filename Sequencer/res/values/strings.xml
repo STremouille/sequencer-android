@@ -14,5 +14,9 @@
     <string name="valid">Validate</string>
     <string name="cancel">Cancel</string>
     <string name="pickTheVolume">Pick the volume</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_init">InitActivity</string>
+    <string name="helloInit">Welcome !</string>
 
 </resources>

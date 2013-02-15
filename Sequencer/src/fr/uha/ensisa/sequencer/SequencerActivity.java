@@ -40,19 +40,41 @@ public class SequencerActivity extends Activity {
 	private static final int DEFAULT_TEMPO = 140;
 	ArrayList<MediaPlayer> mp;
 	HashMap<Integer, MediaPlayer> mediaPlayers;
-	CheckBoxParcelable checkbox;
+	HashMapCheckBoxParcelable checkbox;
+	HashMap<String, ArrayList<CheckBox>> checkBoxModel;
 	static TreeMap<Integer, String> instrumentNameById;
 	Button start, stop, addLine;
 	Timer t;
 	float tempo;
-	Context context;
+	public static Context context;
 	EditText editTempo;
 	TextView numTV;
+	LinearLayout layout;
 	android.widget.LinearLayout.LayoutParams foot,body,eraseButton,instrumentName,checkBoxPm;
-
+	
+	public static TreeMap<Integer, String> initInstr(){
+		if (instrumentNameById == null) {
+			Log.i("myassets", "InstruList vide");
+			instrumentNameById = new TreeMap<Integer, String>();
+			instrumentNameById.put(0, "kick.wav");
+			instrumentNameById.put(1, "tom.wav");
+			instrumentNameById.put(2, "wooble.mp3");
+			instrumentNameById.put(3, "wooble2.mp3");
+		}
+		return instrumentNameById;
+	}
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		//Init du champs checkbox dans les extras
+		Intent intent = getIntent();
+		Log.v("parcelable", "get checbox");
+		ArrayList<HashMapCheckBoxParcelable> cb = (ArrayList<HashMapCheckBoxParcelable>) intent.getExtras().get("checkbox");
+		Log.v("parcelable", cb.get(0).toString());			
+		this.checkbox=cb.get(0);
+		
 		setContentView(R.layout.main);
 		initListInstrument();
 		int instrumentCount = instrumentNameById.keySet().size();
@@ -76,8 +98,10 @@ public class SequencerActivity extends Activity {
 	}
 
 	public void initView() {
+		Log.v("parcelable", "*****"+checkbox);
 		fetchTransmittedInstrument();
 		fetchNewVolume();
+		
 		
 		foot = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 1.0f);
 		body = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 1.0f);
@@ -85,15 +109,14 @@ public class SequencerActivity extends Activity {
 		checkBoxPm = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT,1.0f);
 		instrumentName = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 1.0f);
 		
-		checkbox = new CheckBoxParcelable();
-		LinearLayout layout = new LinearLayout(this);
+		checkBoxModel = new HashMap<String, ArrayList<CheckBox>>();
+		layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
 		mediaPlayers = new HashMap<Integer, MediaPlayer>();
 		
 		
 		//line by line
 		for (int line : instrumentNameById.keySet()) {
-			ArrayList<CheckBox> temp = new ArrayList<CheckBox>();
 			LinearLayout instrumentLine = new LinearLayout(this);
 			
 			//name of instrument
@@ -127,13 +150,17 @@ public class SequencerActivity extends Activity {
 			instrumentLine.addView(numTV);*/
 
 			// init of checkbox
-			for (int i = 0; i < 4; i++) {
+			ArrayList<CheckBox> checkBoxLine = new ArrayList<CheckBox>();
+			for(int i=0;i<4;i++){
 				CheckBox cb = new CheckBox(this);
 				cb.setGravity(Gravity.CENTER);
+				if(checkbox.getData().get(instrumentNameById.get(line)).get(i)==true)
+					cb.setChecked(true);
+				checkBoxLine.add(cb);
 				instrumentLine.addView(cb,checkBoxPm);
-				temp.add(cb);
 			}
-			checkbox.put(line+"", temp);
+			checkBoxModel.put(instrumentNameById.get(line), checkBoxLine);
+					
 			
 			//switch
 			ImageView switchInstrument = new ImageView(this);
@@ -142,9 +169,14 @@ public class SequencerActivity extends Activity {
 			switchInstrument.setOnClickListener(new View.OnClickListener() {
 
 				public void onClick(View v) {
-					Intent intent = new Intent(context,
-							FileChooserActivity.class);
+					updateHashMapCheckBox();
+					Intent intent = new Intent(v.getContext(),FileChooserActivity.class);
+					ArrayList<HashMapCheckBoxParcelable> cb = new ArrayList<HashMapCheckBoxParcelable>();
+					cb.add(checkbox);
+					Log.v("parcelable", "post checbox "+cb.get(0));
+					intent.putParcelableArrayListExtra("checkbox", cb);
 					intent.putExtra("InstrumentLine", lineNb);
+					intent.putExtra("comingFrom", "switch");
 					Log.i("myassets", lineNb + "");
 					startActivity(intent);
 				}
@@ -157,6 +189,7 @@ public class SequencerActivity extends Activity {
 			delete.setOnClickListener(new View.OnClickListener() {
 				
 				public void onClick(View v) {
+					updateHashMapCheckBox();
 					reconstruct(lineNb);
 					initView();
 				}
@@ -173,7 +206,13 @@ public class SequencerActivity extends Activity {
 		addLine.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
-				Intent intent = new Intent(context, FileChooserActivity.class);
+				updateHashMapCheckBox();
+				Intent intent = new Intent(v.getContext(), FileChooserActivity.class);
+				ArrayList<HashMapCheckBoxParcelable> cb = new ArrayList<HashMapCheckBoxParcelable>();
+				cb.add(checkbox);
+				Log.v("parcelable", "post checbox "+cb.get(0));
+				intent.putParcelableArrayListExtra("checkbox", cb);
+				intent.putExtra("comingFrom", "add");
 				if(instrumentNameById.isEmpty())
 					intent.putExtra("InstrumentLine", 1);
 				else
@@ -236,6 +275,7 @@ public class SequencerActivity extends Activity {
 					instrumentNameById.put(line1, rse);
 					Log.i("change size", instrumentNameById.size()+"->"+instrumentNameById.get(5));
 				}
+
 	}
 	
 	
@@ -252,6 +292,7 @@ public class SequencerActivity extends Activity {
 	}
 
 	private void startMusic() {
+		updateHashMapCheckBox();
 		this.stopMusic();
 		tempo = getTempo();
 
@@ -287,6 +328,7 @@ public class SequencerActivity extends Activity {
 	private void reconstruct(int i)
 	{
 		instrumentNameById.remove(i);
+		updateHashMapCheckBox();
 	}
 
 	@Override
@@ -304,7 +346,12 @@ public class SequencerActivity extends Activity {
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		switch(item.getItemId()){
 		case R.id.volume:
-			Intent i = new Intent(context,VolumeChooserActivity.class);
+			updateHashMapCheckBox();
+			Intent i = new Intent(this,VolumeChooserActivity.class);
+			ArrayList<HashMapCheckBoxParcelable> cb = new ArrayList<HashMapCheckBoxParcelable>();
+			cb.add(checkbox);
+			Log.v("parcelable", "post checbox "+cb.get(0));
+			i.putParcelableArrayListExtra("checkbox", cb);
 			startActivity(i);			
 			return true;
 		}
@@ -312,16 +359,24 @@ public class SequencerActivity extends Activity {
 	}
 
 	@Override
-	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-		checkbox=savedInstanceState.getParcelable("checkbox");
-		super.onRestoreInstanceState(savedInstanceState);
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+	}
+	
+	private void updateHashMapCheckBox(){
+		for(int i : instrumentNameById.keySet()){
+			ArrayList<CheckBox> checkBoxLineModel = checkBoxModel.get(instrumentNameById.get(i));
+			for(int c=0;c<4;c++){
+				if(checkBoxLineModel.get(c).isChecked())
+					checkbox.getData().get(instrumentNameById.get(i)).set(c, true);
+				else
+					checkbox.getData().get(instrumentNameById.get(i)).set(c, false);
+			}
+		}
 	}
 
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		outState.putParcelable("checkbox", checkbox);
-		super.onSaveInstanceState(outState);
-	}
+	
 	
 	
 	
