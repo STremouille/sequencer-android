@@ -1,11 +1,14 @@
 package fr.uha.ensisa.sequencer;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable.Orientation;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -16,6 +19,7 @@ import android.widget.TextView;
 public class VolumeChooserActivity extends Activity{
 	
 	Context context;
+	ArrayList<Parcelable> data;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +29,9 @@ public class VolumeChooserActivity extends Activity{
 		LinearLayout layout = new LinearLayout(this);
 		final SeekBar bar = new SeekBar(this);
 		bar.setMax(15);
+		
+		//fetch hashmap of checkbox
+		data = getIntent().getParcelableArrayListExtra("checkbox");
 		
 		
 		AudioManager audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -43,6 +50,7 @@ public class VolumeChooserActivity extends Activity{
 				// TODO Auto-generated method stub
 				Intent i = new Intent(context,SequencerActivity.class);
 				i.putExtra("volume", bar.getProgress());
+				i.putParcelableArrayListExtra("checkbox", data);
 				startActivity(i);
 			}
 		});
@@ -51,6 +59,7 @@ public class VolumeChooserActivity extends Activity{
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				Intent i = new Intent(context,SequencerActivity.class);
+				i.putParcelableArrayListExtra("checkbox", data);
 				startActivity(i);
 			}
 		});
