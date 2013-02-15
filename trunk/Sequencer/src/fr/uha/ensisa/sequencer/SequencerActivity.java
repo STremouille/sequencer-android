@@ -57,7 +57,7 @@ public class SequencerActivity extends Activity {
 			Log.i("myassets", "InstruList vide");
 			instrumentNameById = new TreeMap<Integer, String>();
 			instrumentNameById.put(0, "kick.wav");
-			instrumentNameById.put(1, "tom.wav");
+			instrumentNameById.put(1, "Cymbal.mp3");
 			instrumentNameById.put(2, "wooble.mp3");
 			instrumentNameById.put(3, "wooble2.mp3");
 		}
@@ -76,7 +76,7 @@ public class SequencerActivity extends Activity {
 		this.checkbox=cb.get(0);
 		
 		setContentView(R.layout.main);
-		initListInstrument();
+		initInstr();
 		int instrumentCount = instrumentNameById.keySet().size();
 		Log.i("create", "creation avec "+instrumentCount+" éléments");
 		context = this;
@@ -86,16 +86,7 @@ public class SequencerActivity extends Activity {
 
 	}
 
-	public void initListInstrument() {
-		if (instrumentNameById == null) {
-			Log.i("myassets", "InstruList vide");
-			instrumentNameById = new TreeMap<Integer, String>();
-			instrumentNameById.put(0, "kick.wav");
-			instrumentNameById.put(1, "tom.wav");
-			instrumentNameById.put(2, "wooble.mp3");
-			instrumentNameById.put(3, "wooble2.mp3");
-		}
-	}
+	
 
 	public void initView() {
 		Log.v("parcelable", "*****"+checkbox);
